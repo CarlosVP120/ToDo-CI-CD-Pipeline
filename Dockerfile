@@ -1,6 +1,10 @@
 # Utiliza una imagen base de Ubuntu
 FROM ubuntu:latest
 
+# Establece variables de entorno para evitar interacciones interactivas
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
 # Actualiza el sistema e instala los paquetes necesarios
 RUN apt-get update && apt-get install -y \
     apache2 \
