@@ -1,25 +1,28 @@
-#!/usr/bin/env groovy
-
 pipeline {
-
-    agent {
-        docker {
-            image 'node'
-            args '-u root'
-        }
-    }
+    agent any
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo 'Building...'
-                sh 'npm install'
+                git 'https://github.com/CarlosVP120/ToDo-CI-CD-Pipeline'  # Reemplaza con la URL de tu repositorio
             }
         }
-        stage('Test') {
+
+        stage('Build and Test') {
             steps {
-                echo 'Testing...'
-                sh 'npm test'
+                sh 'docker build -t my-app:latest .'  # Construir la imagen Docker
+                sh 'docker run --rm my-app:latest php Test/tests.php'  # Ejecutar pruebas
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    if (currentBuild.result == 'SUCCESS') {
+                        sh 'docker tag my-app:latest tu_usuario/my-app:latest'  # Etiquetar la imagen
+                        sh 'docker push tu_usuario/my-app:latest'  # Publicar la imagen en Docker Hub
+                    }
+                }
             }
         }
     }
